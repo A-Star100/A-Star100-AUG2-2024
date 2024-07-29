@@ -1,0 +1,8 @@
+package com.google.android.gms.internal.ads;
+
+/* compiled from: com.google.android.gms:play-services-ads@@23.1.0 */
+public class zzekh extends zzdyi {
+    public zzekh(int i, String str) {
+        super(i, str);
+    }
+}

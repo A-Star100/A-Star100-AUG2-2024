@@ -1,0 +1,95 @@
+package com.onesignal.notifications;
+
+import com.onesignal.common.modules.IModule;
+import com.onesignal.common.services.ServiceBuilder;
+import com.onesignal.core.internal.startup.IStartableService;
+import com.onesignal.notifications.internal.INotificationActivityOpener;
+import com.onesignal.notifications.internal.NotificationsManager;
+import com.onesignal.notifications.internal.analytics.IAnalyticsTracker;
+import com.onesignal.notifications.internal.backend.INotificationBackendService;
+import com.onesignal.notifications.internal.backend.impl.NotificationBackendService;
+import com.onesignal.notifications.internal.badges.IBadgeCountUpdater;
+import com.onesignal.notifications.internal.badges.impl.BadgeCountUpdater;
+import com.onesignal.notifications.internal.bundle.INotificationBundleProcessor;
+import com.onesignal.notifications.internal.bundle.impl.NotificationBundleProcessor;
+import com.onesignal.notifications.internal.channels.INotificationChannelManager;
+import com.onesignal.notifications.internal.channels.impl.NotificationChannelManager;
+import com.onesignal.notifications.internal.data.INotificationQueryHelper;
+import com.onesignal.notifications.internal.data.INotificationRepository;
+import com.onesignal.notifications.internal.data.impl.NotificationQueryHelper;
+import com.onesignal.notifications.internal.data.impl.NotificationRepository;
+import com.onesignal.notifications.internal.display.INotificationDisplayBuilder;
+import com.onesignal.notifications.internal.display.INotificationDisplayer;
+import com.onesignal.notifications.internal.display.ISummaryNotificationDisplayer;
+import com.onesignal.notifications.internal.display.impl.NotificationDisplayBuilder;
+import com.onesignal.notifications.internal.display.impl.NotificationDisplayer;
+import com.onesignal.notifications.internal.display.impl.SummaryNotificationDisplayer;
+import com.onesignal.notifications.internal.generation.INotificationGenerationProcessor;
+import com.onesignal.notifications.internal.generation.INotificationGenerationWorkManager;
+import com.onesignal.notifications.internal.generation.impl.NotificationGenerationProcessor;
+import com.onesignal.notifications.internal.generation.impl.NotificationGenerationWorkManager;
+import com.onesignal.notifications.internal.lifecycle.INotificationLifecycleService;
+import com.onesignal.notifications.internal.lifecycle.impl.NotificationLifecycleService;
+import com.onesignal.notifications.internal.limiting.INotificationLimitManager;
+import com.onesignal.notifications.internal.limiting.impl.NotificationLimitManager;
+import com.onesignal.notifications.internal.listeners.DeviceRegistrationListener;
+import com.onesignal.notifications.internal.listeners.NotificationListener;
+import com.onesignal.notifications.internal.open.INotificationOpenedProcessor;
+import com.onesignal.notifications.internal.open.INotificationOpenedProcessorHMS;
+import com.onesignal.notifications.internal.open.impl.NotificationOpenedProcessor;
+import com.onesignal.notifications.internal.open.impl.NotificationOpenedProcessorHMS;
+import com.onesignal.notifications.internal.permissions.INotificationPermissionController;
+import com.onesignal.notifications.internal.permissions.impl.NotificationPermissionController;
+import com.onesignal.notifications.internal.pushtoken.IPushTokenManager;
+import com.onesignal.notifications.internal.pushtoken.PushTokenManager;
+import com.onesignal.notifications.internal.receivereceipt.IReceiveReceiptProcessor;
+import com.onesignal.notifications.internal.receivereceipt.IReceiveReceiptWorkManager;
+import com.onesignal.notifications.internal.receivereceipt.impl.ReceiveReceiptProcessor;
+import com.onesignal.notifications.internal.receivereceipt.impl.ReceiveReceiptWorkManager;
+import com.onesignal.notifications.internal.registration.IPushRegistrator;
+import com.onesignal.notifications.internal.registration.impl.GooglePlayServicesUpgradePrompt;
+import com.onesignal.notifications.internal.registration.impl.IPushRegistratorCallback;
+import com.onesignal.notifications.internal.restoration.INotificationRestoreProcessor;
+import com.onesignal.notifications.internal.restoration.INotificationRestoreWorkManager;
+import com.onesignal.notifications.internal.restoration.impl.NotificationRestoreProcessor;
+import com.onesignal.notifications.internal.restoration.impl.NotificationRestoreWorkManager;
+import com.onesignal.notifications.internal.summary.INotificationSummaryManager;
+import com.onesignal.notifications.internal.summary.impl.NotificationSummaryManager;
+import kotlin.Metadata;
+import kotlin.jvm.internal.Intrinsics;
+
+@Metadata(d1 = {"\u0000\u0018\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0010\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\b\u0000\u0018\u00002\u00020\u0001B\u0005¢\u0006\u0002\u0010\u0002J\u0010\u0010\u0003\u001a\u00020\u00042\u0006\u0010\u0005\u001a\u00020\u0006H\u0016¨\u0006\u0007"}, d2 = {"Lcom/onesignal/notifications/NotificationsModule;", "Lcom/onesignal/common/modules/IModule;", "()V", "register", "", "builder", "Lcom/onesignal/common/services/ServiceBuilder;", "com.onesignal.notifications"}, k = 1, mv = {1, 7, 1}, xi = 48)
+/* compiled from: NotificationsModule.kt */
+public final class NotificationsModule implements IModule {
+    public void register(ServiceBuilder serviceBuilder) {
+        Intrinsics.checkNotNullParameter(serviceBuilder, "builder");
+        serviceBuilder.register(NotificationBackendService.class).provides(INotificationBackendService.class);
+        serviceBuilder.register(NotificationRestoreWorkManager.class).provides(INotificationRestoreWorkManager.class);
+        serviceBuilder.register(NotificationQueryHelper.class).provides(INotificationQueryHelper.class);
+        serviceBuilder.register(BadgeCountUpdater.class).provides(IBadgeCountUpdater.class);
+        serviceBuilder.register(NotificationRepository.class).provides(INotificationRepository.class);
+        serviceBuilder.register(NotificationGenerationWorkManager.class).provides(INotificationGenerationWorkManager.class);
+        serviceBuilder.register(NotificationBundleProcessor.class).provides(INotificationBundleProcessor.class);
+        serviceBuilder.register(NotificationChannelManager.class).provides(INotificationChannelManager.class);
+        serviceBuilder.register(NotificationLimitManager.class).provides(INotificationLimitManager.class);
+        serviceBuilder.register(NotificationDisplayer.class).provides(INotificationDisplayer.class);
+        serviceBuilder.register(SummaryNotificationDisplayer.class).provides(ISummaryNotificationDisplayer.class);
+        serviceBuilder.register(NotificationDisplayBuilder.class).provides(INotificationDisplayBuilder.class);
+        serviceBuilder.register(NotificationGenerationProcessor.class).provides(INotificationGenerationProcessor.class);
+        serviceBuilder.register(NotificationRestoreProcessor.class).provides(INotificationRestoreProcessor.class);
+        serviceBuilder.register(NotificationSummaryManager.class).provides(INotificationSummaryManager.class);
+        serviceBuilder.register(NotificationOpenedProcessor.class).provides(INotificationOpenedProcessor.class);
+        serviceBuilder.register(NotificationOpenedProcessorHMS.class).provides(INotificationOpenedProcessorHMS.class);
+        serviceBuilder.register(NotificationPermissionController.class).provides(INotificationPermissionController.class);
+        serviceBuilder.register(NotificationLifecycleService.class).provides(INotificationLifecycleService.class);
+        serviceBuilder.register(NotificationsModule$register$1.INSTANCE).provides(IAnalyticsTracker.class);
+        serviceBuilder.register(NotificationsModule$register$2.INSTANCE).provides(IPushRegistrator.class).provides(IPushRegistratorCallback.class);
+        serviceBuilder.register(GooglePlayServicesUpgradePrompt.class).provides(GooglePlayServicesUpgradePrompt.class);
+        serviceBuilder.register(PushTokenManager.class).provides(IPushTokenManager.class);
+        serviceBuilder.register(ReceiveReceiptWorkManager.class).provides(IReceiveReceiptWorkManager.class);
+        serviceBuilder.register(ReceiveReceiptProcessor.class).provides(IReceiveReceiptProcessor.class);
+        serviceBuilder.register(DeviceRegistrationListener.class).provides(IStartableService.class);
+        serviceBuilder.register(NotificationListener.class).provides(IStartableService.class);
+        serviceBuilder.register(NotificationsManager.class).provides(INotificationsManager.class).provides(INotificationActivityOpener.class);
+    }
+}

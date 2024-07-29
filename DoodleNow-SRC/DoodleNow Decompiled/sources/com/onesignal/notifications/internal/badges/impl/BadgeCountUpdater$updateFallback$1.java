@@ -1,0 +1,31 @@
+package com.onesignal.notifications.internal.badges.impl;
+
+import com.onesignal.core.internal.database.ICursor;
+import kotlin.Metadata;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.internal.Intrinsics;
+import kotlin.jvm.internal.Lambda;
+import kotlin.jvm.internal.Ref;
+
+@Metadata(d1 = {"\u0000\u000e\n\u0000\n\u0002\u0010\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\u0010\u0000\u001a\u00020\u00012\u0006\u0010\u0002\u001a\u00020\u0003H\n¢\u0006\u0002\b\u0004"}, d2 = {"<anonymous>", "", "it", "Lcom/onesignal/core/internal/database/ICursor;", "invoke"}, k = 3, mv = {1, 7, 1}, xi = 48)
+/* compiled from: BadgeCountUpdater.kt */
+final class BadgeCountUpdater$updateFallback$1 extends Lambda implements Function1<ICursor, Unit> {
+    final /* synthetic */ Ref.IntRef $notificationCount;
+
+    /* JADX INFO: super call moved to the top of the method (can break code semantics) */
+    BadgeCountUpdater$updateFallback$1(Ref.IntRef intRef) {
+        super(1);
+        this.$notificationCount = intRef;
+    }
+
+    public /* bridge */ /* synthetic */ Object invoke(Object obj) {
+        invoke((ICursor) obj);
+        return Unit.INSTANCE;
+    }
+
+    public final void invoke(ICursor iCursor) {
+        Intrinsics.checkNotNullParameter(iCursor, "it");
+        this.$notificationCount.element = iCursor.getCount();
+    }
+}
